@@ -1,0 +1,1 @@
+"use strict";var form=document.querySelector(".form");form.addEventListener("submit",function(e){e.preventDefault();new validateForm({form:form})});
