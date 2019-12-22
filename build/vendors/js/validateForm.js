@@ -21,19 +21,25 @@ class validateForm {
 
 		for(let i = 0; i < inputs.length; i++) {
 			let required = inputs[i].getAttribute('data-role').includes('required');
-			if(required && inputs[i].value == '') {
+			if(required && (inputs[i].value == '' || !inputs[i].checked)) {
+				console.log(inputs[i])
 					this.errors.push(inputs[i]);
+					
+			} else {
+				inputs[i].classList.remove('error');
 			}
-		}
-		
+		}		
 		
 		if(this.errors.length) {
 			console.log(111)
 			this.errors.forEach(item => {
+				console.log(item)
 				item.classList.add('error');
 			});
 			return false;
 		}
+
+
 
 		inputs.forEach(item => {
 			
