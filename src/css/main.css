@@ -1,3 +1,58 @@
 .error {
-  border-color: red;
+  background: #ffa4a2;
+}
+
+.form {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flex;
+  display: -o-flex;
+  display: flex;
+  flex-direction: column;
+  width: 40%;
+  margin: 30px auto 0;
+  justify-content: center;
+  background: #ffcdd2;
+  padding: 15px 15px 25px;
+}
+
+label {
+  font-size: 16px;
+  margin: 10px 0 5px;
+}
+
+input:not([type='checkbox']) {
+  border: none;
+  height: 30px;
+  padding: 3px 15px;
+  font-size: 16px;
+}
+
+.checkbox-container {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flex;
+  display: -o-flex;
+  display: flex;
+  align-items: center;
+  margin: 10px 0 5px;
+}
+
+.checkbox-container label {
+  margin: 0 5px 0;
+}
+
+#submit {
+  width: 30%;
+  margin: 10px auto 0;
+  background: #f48fb1;
+  border: none;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all .3s;
+}
+
+#submit:hover {
+  transform: scale(1.03);
+  background: #f278a1;
 }

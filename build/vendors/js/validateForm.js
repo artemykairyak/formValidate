@@ -1,34 +1,89 @@
 function formValidate(options) {
+    console.log('sss')
     let vf = new validateForm(options)
+    let reload = () => {
+        console.log('reload')
+    }
+}
+ let elem = null;
+ let filesArr = [];
+
+function reloadFiles(form) {
+    let fileInput = form.querySelector('input[type="file"]');
+    let files = fileInput.files;
+    // [].forEach.call(files, (item => {
+    // 		filesArr.push(item);          
+    // 		fileInput.files[files.length + 1] = item; 
+    //     }));
+    
+    
+    
+    // filesArr.push(...files)
+    // console.log(filesArr);
+   
+   
+    if (!form.querySelector('.formValidate__files-containter')) {
+        console.log('if')
+        elem = document.createElement("div");
+        elem.classList.add('formValidate__files-containter');
+        fileInput.insertAdjacentElement('afterend', elem);
+        //elem.innerHTML = '';
+        [].forEach.call(files, ((item, i) => {
+            let input = document.createElement("input");
+            input.setAttribute('type', 'file');
+            input.files[i] = item;
+            console.log(input.files)
+            elem.appendChild(input)
+        }))
+    } else {
+    	elem.innerHTML = '';
+        console.log('else');
+        filesArr.forEach(item => {
+            console.log(item);
+            
+            let span = document.createElement("span");
+            span.innerHTML = item.name;
+            elem.appendChild(span);
+        })
+    }
+
+
+
+
+
+
 }
 
 class validateForm {
     constructor(options) {
+        console.log('kek')
         this.form = options.form;
         this.length = options.form.children.length;
         this.errors = [];
+        this.passwordRegExp = options.passwordRegEx || /^.{6,}$/;
         this.emailRegExp = options.emailRegExp || /^[-._a-z0-9]+@(?:[a-z0-9][-a-z0-9]+\.)+[a-z]{2,6}$/;
         this.phoneRegExp = options.phoneRegExp || /^(\s*)?(\+)?([- _():=+]?\d[- _():=+]?){10,14}(\s*)?$/;
         this.url = options.url;
-        this.data = {};
         this.onLoadStart = options.onLoadStart;
         this.onSuccess = options.onSuccess;
         this.onError = options.onError;
+        this.errorClass = options.errorClass || 'error';
 
         this.validation();
+  
     }
+
+
 
     validation() {
         this.errors = [];
 
-        let inputs = [];
-        for (let i = 0; i < this.length; i++) {
-            if (form.children[i].type && form.children[i].type !== 'button' && form.children[i].type !== 'submit') {
-                inputs.push(form.children[i]);
-            }
-        }
+        let inputs = this.form.querySelectorAll('input');
 
         for (let i = 0; i < inputs.length; i++) {
+            if (inputs[i].type === 'button' || inputs[i].type === 'submit' || inputs[i].type === 'file') {
+                continue;
+            }
             let required = inputs[i].getAttribute('data-role').includes('required');
 
             if ((required && inputs[i].value === '') ||
@@ -38,29 +93,27 @@ class validateForm {
                 this.phoneValidation(inputs[i])
             } else if (inputs[i].getAttribute('data-role').includes('email')) {
                 this.emailValidation(inputs[i])
+            } else if (inputs[i].getAttribute('data-role').includes('password')) {
+                this.passwordValidation(inputs[i])
             } else {
-                let key = inputs[i].getAttribute('name');
-                this.data[key] = inputs[i].value;
-                inputs[i].classList.remove('error');
+                inputs[i].classList.remove(this.errorClass);
             }
         }
 
         if (this.errors.length) {
             this.errors.forEach(item => {
-                item.classList.add('error');
+                item.classList.add(this.errorClass);
                 return false;
             });
         } else {
-            this.sendInfo(this.data, this.url);
+            this.sendInfo(this.url);
         }
     }
 
     phoneValidation = input => {
         if (input.value.match(this.phoneRegExp)) {
             this.errors.pop(input);
-            input.classList.remove('error');
-            let key = input.getAttribute('name');
-            this.data[key] = input.value;
+            input.classList.remove(this.errorClass);
             return true;
         }
 
@@ -71,9 +124,7 @@ class validateForm {
     emailValidation = input => {
         if (input.value.match(this.emailRegExp)) {
             this.errors.pop(input);
-            input.classList.remove('error');
-            let key = input.getAttribute('name');
-            this.data[key] = input.value;
+            input.classList.remove(this.errorClass);
             return true;
         }
 
@@ -81,27 +132,41 @@ class validateForm {
         return false;
     }
 
-    sendInfo = (data, url) => {
-        let request = new XMLHttpRequest();
-        request.open('POST', url, true);
-        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-
-        request.onloadstart = () => {
-            this.onLoadStart();
+    passwordValidation = input => {
+        if (input.value.match(this.passwordRegExp)) {
+            this.errors.pop(input);
+            input.classList.remove(this.errorClass);
+            return true;
         }
 
-        request.onload = () => {
-            if (request.status >= 200 && request.status < 400) {
+        this.errors.push(input);
+        return false;
+    }
+
+    sendInfo = async (url) => {
+    	let data = new FormData(this.form);
+    	// filesArr.forEach(item => {
+    	// 	console.log(111)
+    	// 	console.log(item)
+    	// 	data.append('file', item, item.name);
+    	// })
+    	
+        this.onLoadStart();
+        fetch(url, {
+                method: 'post',
+                body: data,
+
+            })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
                 this.onSuccess();
-            } else {
+                console.log(data);
+            })
+            .catch(error => {
                 this.onError();
-            }
-        };
-
-        request.onerror = () => {
-            this.onError();
-        };
-
-        request.send(JSON.stringify(data));
+                console.log(error);
+            });
     }
 }

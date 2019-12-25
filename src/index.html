@@ -7,21 +7,26 @@
 	<meta name="description" content="Описание страницы для SEO и соцсетей">
 	<meta name="keywords" content="ключевые, слова, через, запятую">
 	<link rel="shortcut icon" type='image/png' href="img/icons/favicon.ico" />
-	<title>ValidateForm</title>
+	<title>FormValidate</title>
 	<link rel="stylesheet" href="css/main.css" type="text/css">
 </head>
 <body>
-	<form action="" method="POST" name='form' class="form">
+	<form action="" method="POST" name='form' class="form" enctype="multipart/form-data">
 		<label for="phone">Phone</label>
 		<input type="text" id="phone" name='phone' data-role='phone required'>
 		<label for="email">Email</label>
 		<input type="text" id="email" name='email' data-role='email required'>
 		<label for="password">Password</label>
 		<input type="password" id="password" name='password' data-role='password required'>
+		<div class="checkbox-container">
+			<input type="checkbox" id="checkbox" name='checkbox' data-role='checkbox'>
 		<label for="checkbox">Agree</label>
-		<input type="checkbox" id="checkbox" name='checkbox' data-role='checkbox'>
+		</div>
 		<label for="comment">Comment</label>
 		<input type="text" id="comment" name='comment' data-role>
+		<div class="file-container">
+			<input name="file[]" multiple type="file" id="file" class='file' data-role>
+		</div>
 		<input type="submit" id='submit' name='submit' value='Submit'>
 	</form>
 	<script src="vendors/js/validateForm.js"></script>
