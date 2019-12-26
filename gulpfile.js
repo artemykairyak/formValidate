@@ -31,10 +31,7 @@ gulp.task('buildSass', function () {
 });
 gulp.task('buildCss', gulp.series('buildSass', function () {
 	return gulp.src('src/css/*.css')
-	 	.pipe(autoprefixer({
-	        browsers: ['last 2 versions'],
-	        cascade: false
-	    }))
+	 	.pipe(autoprefixer())
     	.pipe(concatCss('css/main.css'))
     	.pipe(cleanCss({
     		compatibility: 'ie8',

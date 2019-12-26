@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Asap build",
   "main": "index.html",
+  "browserslist": [
+    "last 2 version",
+    "> 2%"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -14,7 +18,7 @@
     "browser-sync": "^2.26.3",
     "del": "^3.0.0",
     "gulp": "^4.0.0",
-    "gulp-autoprefixer": "^6.0.0",
+    "gulp-autoprefixer": "^6.1.0",
     "gulp-babel": "^8.0.0",
     "gulp-clean-css": "^4.0.0",
     "gulp-concat": "^2.6.1",

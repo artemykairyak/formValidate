@@ -1,7 +1,10 @@
 let form = document.querySelector('.form');
 
-document.querySelector('.form .file').addEventListener('change', () => {
-	reloadFiles(form);
+document.querySelector('.form').addEventListener('change', (e) => {
+	console.log(e.target);
+	if(e.target.getAttribute('name') === 'file[]') {
+		reloadFiles(form);
+	}
 });
 
 form.addEventListener('submit', function(e) {
