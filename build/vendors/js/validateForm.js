@@ -1,9 +1,12 @@
 function formValidate(options) {
     let vf = new validateForm(options)
-
 }
 
 let globalVars = {
+    counter: 0,
+    inputFirst: false,
+    labelFirst: false,
+    amountFiles: 0
     // fileInputStyle = {
 
     // }
@@ -35,112 +38,134 @@ let globalVars = {
 // 	}
 // }
 
-function filesCounter() {
-    let counter = form.querySelectorAll('input[type="file"]').length;
-    return counter;
-}
-
-function reloadFiles(form) {
+function reloadFiles(options) {
+    let form = options.form;
+    let target = options.target;
     let fileInputs = form.querySelectorAll('input[type="file"]');
     let requiredFile = false;
     let labelText = '';
-    let nextSibling = false;
+    let startLabelText = '';
+
+
+    if (fileInputs[0].files[0]) {
+        fileInputs[0].classList.remove('error');
+    }
+
     let label = document.createElement('label');
     if (fileInputs[0].getAttribute('data-role').includes('required')) {
         requiredFile = true;
     }
     let lastFileInput = fileInputs[fileInputs.length - 1];
 
-    if (fileInputs[0].nextElementSibling && fileInputs[0].nextElementSibling.tagName === 'LABEL') {
-        label = fileInputs[0].nextElementSibling.cloneNode(false);
-        labelText = fileInputs[0].nextElementSibling.innerHTML;
-        nextSibling = true;
-    } else if (fileInputs[0].previousElementSibling && fileInputs[0].previousElementSibling.tagName === 'LABEL') {
-        label = fileInputs[0].previousElementSibling.cloneNode(false);
-
-        labelText = fileInputs[0].previousElementSibling.innerHTML;
+    if (target.nextElementSibling && target.nextElementSibling.tagName === 'LABEL') {
+        options.addText ? startLabelText = options.addText : startLabelText = target.nextElementSibling.innerHTML;
+        label = target.nextElementSibling
+        labelText = target.files[0].name;
+        globalVars.inputFirst = true;
+    } else if (target.previousElementSibling && target.previousElementSibling.tagName === 'LABEL') {
+        label = target.previousElementSibling
+        options.addText ? startLabelText = options.addText : startLabelText = target.previousElementSibling.innerHTML;
+        globalVars.labelFirst = true;
+        labelText = target.files[0].name;
+        lastFileInput.files[0] = '';
     } else {
         console.log('net')
     }
 
     label.innerHTML = labelText;
-    let newInput = this.form.querySelector('input[type="file"]').cloneNode(false);
+    globalVars.counter = ++globalVars.counter;
+    let initialID = fileInputs[0].getAttribute('id');
+    let initialName = fileInputs[0].getAttribute('name');
+    let newInput = document.createElement('input');
+
+    newInput.setAttribute('name', initialName);
+    newInput.setAttribute('type', 'file');
+    newInput.setAttribute('data-role', 'file');
+
     let inputName = newInput.getAttribute('name');
-    let newInputName = this.filesCounter() + inputName;
+    let newInputName = String(globalVars.counter) + inputName;
     let inputID = newInput.getAttribute('id');
-    let newInputID = this.filesCounter() + inputID;
+    let newInputID = String(globalVars.counter) + initialID;
     newInput.setAttribute('ID', newInputID);
     newInput.setAttribute('name', newInputName);
-    // newInput.setAttribute('data-role', 'file');
-    lastFileInput.after(newInput);
-    label.setAttribute('for', newInputID);
-    if (nextSibling) {
 
-        newInput.after(label)
-    } else {
-        newInput.before(label)
+    globalVars.amountFiles = ++globalVars.amountFiles;
+
+    if (globalVars.inputFirst && globalVars.amountFiles <= options.limit) {
+        target.after(label);
+        label.after(newInput);
+        let newLabel = document.createElement('label');
+        newLabel.innerHTML = startLabelText;
+        newLabel.setAttribute('for', newInputID);
+        newInput.after(newLabel);
+
+        if (globalVars.amountFiles === options.limit) {
+            let inputs = form.querySelectorAll('input[type="file"]');
+            inputs[inputs.length - 1].setAttribute('disabled', '');
+        }
+    } else if (globalVars.labelFirst && globalVars.amountFiles <= options.limit) {
+        let newLabel = document.createElement('label');
+        newLabel.setAttribute('for', newInputID);
+        newLabel.innerHTML = startLabelText;
+        target.after(newLabel);
+        target.nextElementSibling.after(newInput);
+        if (globalVars.amountFiles === options.limit) {
+            let inputs = form.querySelectorAll('input[type="file"]');
+            inputs[inputs.length - 1].setAttribute('disabled', '');
+        }
     }
 
     fileInputs.forEach(item => {
         item.addEventListener('click', (e) => {
-            e.preventDefault();
-            delete item.files[0];
-            item.remove();
+            if (globalVars.inputFirst && e.target.files) {
+                e.preventDefault();
+                if (item.nextElementSibling) {
+                    item.nextElementSibling.remove();
+                }
+                delete item.files[0];
+                if (form.querySelectorAll('input[type="file"]').length - 1 === 1) {
+                    console.log('here')
+                    // console.log(globalVars.amountFiles)
+                    globalVars.amountFiles = 0;
+                } else {
+                    console.log('else')
+                    //globalVars.amountFiles = --globalVars.amountFiles;
+                }
+                item.remove();
+                // console.log( globalVars.amountFiles)
+
+                console.log(globalVars.amountFiles, options.limit)
+                // console.log(globalVars.amountFiles)
+                if (globalVars.amountFiles === options.limit) {
+
+                    form.querySelectorAll('input[type="file"]')[form.querySelectorAll('input[type="file"]').length - 1].setAttribute('disabled', '');
+                } else {
+                    form.querySelectorAll('input[type="file"]')[form.querySelectorAll('input[type="file"]').length - 1].removeAttribute('disabled', '');
+                }
+            }
+
+            if (globalVars.labelFirst && e.target.files) {
+                e.preventDefault();
+                if (item.previousElementSibling) {
+                    item.previousElementSibling.remove();
+                }
+                delete item.files[0];
+                if (fileInputs.length === 1) {
+                    globalVars.amountFiles = --globalVars.amountFiles;
+                }
+
+                if (globalVars.amountFiles === options.limit) {
+                    fileInputs[fileInputs.length - 1].nextElementSibling.nextElementSibling.removeAttribute('disabled', '');
+                }
+                item.remove();
+
+            }
 
             if (fileInputs.length === 1 && requiredFile) {
                 form.querySelectorAll('input[type="file"]')[0].setAttribute('data-role', 'file required')
             }
         })
     });
-    // [].forEach.call(files, (item => {
-
-    // fileInputs.addEventListener('click', (e) => {
-    // 	e.target.remove();
-    // })
-
-    // [].forEach.call(files, (item => {
-    //     filesArr.push(item);
-    //     // fileInput.files[files.length + 1] = item; 
-
-    //     if (!form.querySelector('.formValidate__files-containter')) {
-    //         console.log('if')
-    //         elem = document.createElement("div");
-    //         elem.classList.add('formValidate__files-containter');
-    //         fileInput.insertAdjacentElement('afterend', elem);
-    //         //elem.innerHTML = '';
-    //         let input = document.createElement("input");
-    //             input.setAttribute('type', 'file');
-    //             input.files[0] = item;
-    //             console.log(input.files)
-    //             elem.appendChild(input)
-    //     } else {
-    //         //elem.innerHTML = '';
-    //         console.log('else');
-
-    //         let input = document.createElement("input");
-    //             input.setAttribute('type', 'file');
-    //             input.files[0] = item;
-    //             elem.appendChild(input)
-
-    //     }
-
-    // }));
-
-
-
-
-
-    // filesArr.push(...files)
-    //console.log(filesArr);
-
-
-
-
-
-
-
-
-
 }
 
 class validateForm {
@@ -158,7 +183,6 @@ class validateForm {
         this.errorClass = options.errorClass || 'error';
 
         this.validation();
-
     }
 
     validation() {
@@ -192,7 +216,17 @@ class validateForm {
                 return false;
             });
         } else {
-            this.sendInfo(this.url);
+            let errors = false;
+            inputs.forEach(item => {
+                if (item.classList.contains('error')) {
+                    errors = true;
+                    return false;
+                }
+            })
+
+            if (!errors) {
+                this.sendInfo(this.url);
+            }
         }
     }
 
@@ -232,34 +266,33 @@ class validateForm {
 
     cleanForm() {
         this.form.reset();
+
         let firstElem = this.form.querySelector('input[type="file"]');
         let cloneFirstElem = firstElem.cloneNode(false);
         let fileInputs = this.form.querySelectorAll('input[type="file"]');
-        let prevElem = null;
-        if (firstElem.previousElementSibling) {
-            prevElem = firstElem.previousElementSibling;
-        } else {
-            prevElem = firstElem.parentNode;
-        }
+        let prevElem = firstElem.previousElementSibling;
 
-        for (let i = 0; i < fileInputs.length; i++) {
-            fileInputs[i].remove();
-        }
-        if (firstElem.previousElementSibling) {
-            prevElem.after(cloneFirstElem)
-        } else {
-            prevElem.appendChild(cloneFirstElem);
+
+
+
+        for (let i = 0; i < fileInputs.length - 1; i++) {
+            if (globalVars.labelFirst) {
+                fileInputs[i].previousElementSibling.remove();
+                fileInputs[i].remove();
+            } else {
+                fileInputs[i].nextElementSibling.remove();
+                fileInputs[i].remove();
+            }
         }
     }
 
     sendInfo = async (url) => {
         let data = new FormData(this.form);
-
+        this.form.querySelector('input[type="submit"]').setAttribute('disabled', '');
         this.onLoadStart();
         fetch(url, {
                 method: 'post',
                 body: data,
-
             })
             .then(response => {
                 return response.json();
@@ -268,6 +301,7 @@ class validateForm {
                 this.onSuccess();
 
                 this.cleanForm();
+                this.form.querySelector('input[type="submit"]').removeAttribute('disabled');
                 console.log(data);
             })
             .catch(error => {

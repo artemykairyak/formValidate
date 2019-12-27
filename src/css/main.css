@@ -1,5 +1,5 @@
-.error {
-  background: #ffa4a2;
+input:not([type='checkbox']).error {
+  border: 1px solid red;
 }
 
 .form {
@@ -63,4 +63,25 @@ input[type="file"] {
   height: 0.1px;
   visibility: hidden;
   position: absolute;
+}
+
+input[type="file"].error + label {
+  color: red;
+}
+
+input[type="file"] + label {
+  cursor: pointer;
+}
+
+input[type="checkbox"].error + label {
+  color: red;
+}
+
+.file-container {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flex;
+  display: -o-flex;
+  display: flex;
+  flex-direction: column;
 }

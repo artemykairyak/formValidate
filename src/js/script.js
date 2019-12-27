@@ -1,9 +1,13 @@
 let form = document.querySelector('.form');
 
 document.querySelector('.form').addEventListener('change', (e) => {
-	console.log(e.target);
-	if(e.target.getAttribute('name') === 'file[]') {
-		reloadFiles(form);
+	if(e.target.getAttribute('type') === 'file') {
+		reloadFiles({
+			form: form, 
+			target: e.target,
+			addText: 'Upload more',
+			limit: 3
+		});
 	}
 });
 
