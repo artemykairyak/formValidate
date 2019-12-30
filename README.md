@@ -1,4 +1,4 @@
-# FormValidation 
+# FormValidate 
 Small library for validating and submitting forms.
 
 **Sample form:**
