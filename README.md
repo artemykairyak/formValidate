@@ -70,7 +70,7 @@ The form can have any structure, however, inputs with type "file" and their labe
     	}
     });
 **Inputs attributes:**
-`data-role`: all parameters related to validationForm are indicated here. 
+`data-role`: all parameters related to formValidate are indicated here. 
 
 **Possible values:**
 `email`. To validate as an email.
