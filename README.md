@@ -17,7 +17,7 @@ Small library for validating and submitting forms.
    		<label for="comment">Comment</label>
    		<input type="text" id="comment" name='comment' data-role>
    		<div class="file-container">
-   			<input name="file" type="file" id="file" class='file' data-role="file required">
+   			<input name="file" type="file" id="file" data-role="file required">
    			<label class="label" for="file">Upload file</label>
    		</div>
    		<input type="submit" id='submit' name='submit' value='Submit'>
@@ -59,7 +59,7 @@ The form can have any structure, however, inputs with type "file" and their labe
     })
     
 	//LIVE RELOAD INPUTS WITH TYPE "FILE"
-    document.querySelector('.form').addEventListener('change', (e) => {
+    form.addEventListener('change', (e) => {
     	if(e.target.getAttribute('type') === 'file') {
     		reloadFiles({
     			form: form, 
@@ -74,10 +74,15 @@ The form can have any structure, however, inputs with type "file" and their labe
 
 **Possible values:**
 `email`. To validate as an email.
+
 `phone`. To validate as an phone.
+
 `password`. To validate as an password.
+
 `file`. To validate as an file. 
+
 `checkbox`.  To validate as an checkbox. 
+
 `required`. To indicate that this field is required.
 
 **Example:**
