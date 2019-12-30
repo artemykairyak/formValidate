@@ -1,6 +1,6 @@
 let form = document.querySelector('.form');
 
-document.querySelector('.form').addEventListener('change', (e) => {
+form.addEventListener('change', (e) => {
 	if(e.target.getAttribute('type') === 'file') {
 		reloadFiles({
 			form: form, 

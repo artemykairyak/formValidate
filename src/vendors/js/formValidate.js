@@ -1,42 +1,14 @@
 function formValidate(options) {
-    let vf = new validateForm(options)
+    let vf = new validateForm(options);
 }
 
 let globalVars = {
     counter: 0,
     inputFirst: false,
     labelFirst: false,
+    inputsArray: [],
     amountFiles: 0
-    // fileInputStyle = {
-
-    // }
 }
-
-
-// function setValuesFromStorage(form) {
-// 	let inputs = form.querySelectorAll('input');
-// 	sessionStorage.setItem('phone', 1)
-
-// 	for (key in inputs) {
-// 		if(inputs[key] instanceof HTMLElement && inputs[key].getAttribute('data-role') !== '') {
-// 			console.log(inputs[key])
-// 			//console.log(inputs[key].getAttribute('data-role'))
-
-// 			// let attrArr = inputs[key].getAttribute('data-role').split(' ');
-// 			// attrArr.forEach(item => {
-// 			// 	if(item !== 'required' && item !== '') {
-// 			// 		form.querySelector('input[data-role="' + item + '"]').addClass('sdsdsd')
-// 			// 	} 
-// 			// })
-// 			//console.log(attrArr);
-// 			// console.log(sessionStorage.getItem('phone'))
-// 			// console.log(inputs[key].getAttribute('data-role'))
-// 			// if(inputs[key].getAttribute('data-role').includes(sessionStorage.getItem(inputs[key].)))
-// 			// 
-// 		}
-
-// 	}
-// }
 
 function reloadFiles(options) {
     let form = options.form;
@@ -46,30 +18,31 @@ function reloadFiles(options) {
     let labelText = '';
     let startLabelText = '';
 
-
     if (fileInputs[0].files[0]) {
         fileInputs[0].classList.remove('error');
     }
 
     let label = document.createElement('label');
+
     if (fileInputs[0].getAttribute('data-role').includes('required')) {
         requiredFile = true;
     }
+
     let lastFileInput = fileInputs[fileInputs.length - 1];
 
     if (target.nextElementSibling && target.nextElementSibling.tagName === 'LABEL') {
         options.addText ? startLabelText = options.addText : startLabelText = target.nextElementSibling.innerHTML;
-        label = target.nextElementSibling
+        label = target.nextElementSibling;
         labelText = target.files[0].name;
         globalVars.inputFirst = true;
     } else if (target.previousElementSibling && target.previousElementSibling.tagName === 'LABEL') {
-        label = target.previousElementSibling
+        label = target.previousElementSibling;
         options.addText ? startLabelText = options.addText : startLabelText = target.previousElementSibling.innerHTML;
         globalVars.labelFirst = true;
         labelText = target.files[0].name;
         lastFileInput.files[0] = '';
     } else {
-        console.log('net')
+        console.log('Structure error. Must be <input><label> or <label><input>');
     }
 
     label.innerHTML = labelText;
@@ -89,8 +62,6 @@ function reloadFiles(options) {
     newInput.setAttribute('ID', newInputID);
     newInput.setAttribute('name', newInputName);
 
-    globalVars.amountFiles = ++globalVars.amountFiles;
-
     if (globalVars.inputFirst && globalVars.amountFiles <= options.limit) {
         target.after(label);
         label.after(newInput);
@@ -98,6 +69,8 @@ function reloadFiles(options) {
         newLabel.innerHTML = startLabelText;
         newLabel.setAttribute('for', newInputID);
         newInput.after(newLabel);
+
+        globalVars.amountFiles = ++globalVars.amountFiles;
 
         if (globalVars.amountFiles === options.limit) {
             let inputs = form.querySelectorAll('input[type="file"]');
@@ -109,6 +82,8 @@ function reloadFiles(options) {
         newLabel.innerHTML = startLabelText;
         target.after(newLabel);
         target.nextElementSibling.after(newInput);
+        globalVars.amountFiles = ++globalVars.amountFiles;
+
         if (globalVars.amountFiles === options.limit) {
             let inputs = form.querySelectorAll('input[type="file"]');
             inputs[inputs.length - 1].setAttribute('disabled', '');
@@ -116,55 +91,49 @@ function reloadFiles(options) {
     }
 
     fileInputs.forEach(item => {
-        item.addEventListener('click', (e) => {
-            if (globalVars.inputFirst && e.target.files) {
-                e.preventDefault();
-                if (item.nextElementSibling) {
-                    item.nextElementSibling.remove();
-                }
-                delete item.files[0];
-                if (form.querySelectorAll('input[type="file"]').length - 1 === 1) {
-                    console.log('here')
-                    // console.log(globalVars.amountFiles)
-                    globalVars.amountFiles = 0;
-                } else {
-                    console.log('else')
-                    //globalVars.amountFiles = --globalVars.amountFiles;
-                }
-                item.remove();
-                // console.log( globalVars.amountFiles)
-
-                console.log(globalVars.amountFiles, options.limit)
-                // console.log(globalVars.amountFiles)
-                if (globalVars.amountFiles === options.limit) {
-
-                    form.querySelectorAll('input[type="file"]')[form.querySelectorAll('input[type="file"]').length - 1].setAttribute('disabled', '');
-                } else {
-                    form.querySelectorAll('input[type="file"]')[form.querySelectorAll('input[type="file"]').length - 1].removeAttribute('disabled', '');
-                }
-            }
-
-            if (globalVars.labelFirst && e.target.files) {
-                e.preventDefault();
-                if (item.previousElementSibling) {
-                    item.previousElementSibling.remove();
-                }
-                delete item.files[0];
-                if (fileInputs.length === 1) {
+        if (!globalVars.inputsArray.includes(item)) {
+            globalVars.inputsArray.push(item);
+            item.addEventListener('click', (e) => {
+                if (globalVars.inputFirst && e.target.files) {
+                    e.preventDefault();
+                    if (item.nextElementSibling) {
+                        item.nextElementSibling.remove();
+                    }
+                    delete item.files[0];
+                    item.remove();
                     globalVars.amountFiles = --globalVars.amountFiles;
+
+                    if (globalVars.amountFiles === options.limit) {
+                        form.querySelectorAll('input[type="file"]')[form.querySelectorAll('input[type="file"]').length - 1].setAttribute('disabled', '');
+                    } else {
+                        form.querySelectorAll('input[type="file"]')[form.querySelectorAll('input[type="file"]').length - 1].removeAttribute('disabled', '');
+                    }
                 }
 
-                if (globalVars.amountFiles === options.limit) {
-                    fileInputs[fileInputs.length - 1].nextElementSibling.nextElementSibling.removeAttribute('disabled', '');
+                if (globalVars.labelFirst && e.target.files) {
+                    if (!globalVars.inputsArray.includes(item)) {
+                        globalVars.inputsArray.push(item);
+                    }
+                    e.preventDefault();
+                    if (item.previousElementSibling) {
+                        item.previousElementSibling.remove();
+                    }
+                    delete item.files[0];
+                    item.remove();
+                    globalVars.amountFiles = --globalVars.amountFiles;
+
+                    if (globalVars.amountFiles === options.limit) {
+                        form.querySelectorAll('input[type="file"]')[form.querySelectorAll('input[type="file"]').length - 1].setAttribute('disabled', '');
+                    } else {
+                        form.querySelectorAll('input[type="file"]')[form.querySelectorAll('input[type="file"]').length - 1].removeAttribute('disabled', '');
+                    }
                 }
-                item.remove();
 
-            }
-
-            if (fileInputs.length === 1 && requiredFile) {
-                form.querySelectorAll('input[type="file"]')[0].setAttribute('data-role', 'file required')
-            }
-        })
+                if (fileInputs.length === 1 && requiredFile) {
+                    form.querySelectorAll('input[type="file"]')[0].setAttribute('data-role', 'file required')
+                }
+            });
+        }
     });
 }
 
@@ -174,12 +143,12 @@ class validateForm {
         this.length = options.form.children.length;
         this.errors = [];
         this.passwordRegExp = options.passwordRegEx || /^.{6,}$/;
-        this.emailRegExp = options.emailRegExp || /^[-._a-z0-9]+@(?:[a-z0-9][-a-z0-9]+\.)+[a-z]{2,6}$/;
+        this.emailRegExp = options.emailRegExp || /^[-._a-zA-Z0-9]+@(?:[a-z0-9][-a-z0-9]+\.)+[a-z]{2,6}$/;
         this.phoneRegExp = options.phoneRegExp || /^(\s*)?(\+)?([- _():=+]?\d[- _():=+]?){6,14}(\s*)?$/;
         this.url = options.url;
-        this.onLoadStart = options.onLoadStart;
-        this.onSuccess = options.onSuccess;
-        this.onError = options.onError;
+        this.onLoadStart = (() => {}) || options.onLoadStart;
+        this.onSuccess = (() => {}) || options.onSuccess;
+        this.onError = (() => {}) || options.onError;
         this.errorClass = options.errorClass || 'error';
 
         this.validation();
@@ -200,9 +169,9 @@ class validateForm {
                 (required && inputs[i].getAttribute('data-role').includes('checkbox') && !inputs[i].checked)) {
                 this.errors.push(inputs[i]);
             } else if (inputs[i].getAttribute('data-role').includes('phone')) {
-                this.phoneValidation(inputs[i])
+                this.phoneValidation(inputs[i]);
             } else if (inputs[i].getAttribute('data-role').includes('email')) {
-                this.emailValidation(inputs[i])
+                this.emailValidation(inputs[i]);
             } else if (inputs[i].getAttribute('data-role').includes('password')) {
                 this.passwordValidation(inputs[i]);
             } else {
@@ -272,9 +241,6 @@ class validateForm {
         let fileInputs = this.form.querySelectorAll('input[type="file"]');
         let prevElem = firstElem.previousElementSibling;
 
-
-
-
         for (let i = 0; i < fileInputs.length - 1; i++) {
             if (globalVars.labelFirst) {
                 fileInputs[i].previousElementSibling.remove();
@@ -284,6 +250,14 @@ class validateForm {
                 fileInputs[i].remove();
             }
         }
+
+        this.form.querySelectorAll('input[type="file"]')[form.querySelectorAll('input[type="file"]').length - 1].removeAttribute('disabled', '');
+        if (globalVars.inputFirst) {
+            this.form.querySelectorAll('input[type="file"]').nextElementSibling.innerHTML = ''
+        }
+        globalVars.inputsArray = [];
+        globalVars.amountFiles = 0;
+        globalVars.counter = 0;
     }
 
     sendInfo = async (url) => {
@@ -299,10 +273,8 @@ class validateForm {
             })
             .then(data => {
                 this.onSuccess();
-
                 this.cleanForm();
                 this.form.querySelector('input[type="submit"]').removeAttribute('disabled');
-                console.log(data);
             })
             .catch(error => {
                 this.onError();
