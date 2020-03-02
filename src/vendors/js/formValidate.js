@@ -146,9 +146,9 @@ class validateForm {
         this.emailRegExp = options.emailRegExp || /^[-._a-zA-Z0-9]+@(?:[a-z0-9][-a-z0-9]+\.)+[a-z]{2,6}$/;
         this.phoneRegExp = options.phoneRegExp || /^(\s*)?(\+)?([- _():=+]?\d[- _():=+]?){6,14}(\s*)?$/;
         this.url = options.url;
-        this.onLoadStart = (() => {}) || options.onLoadStart;
-        this.onSuccess = (() => {}) || options.onSuccess;
-        this.onError = (() => {}) || options.onError;
+        this.onLoadStart = options.onLoadStart || (() => {});
+        this.onSuccess = options.onSuccess || (() => {});
+        this.onError = options.onError || (() => {});
         this.errorClass = options.errorClass || 'error';
 
         this.validation();
@@ -235,29 +235,29 @@ class validateForm {
 
     cleanForm() {
         this.form.reset();
+        if (this.form.querySelector('input[type="file"]')) {
+            let firstElem = this.form.querySelector('input[type="file"]');
+            let cloneFirstElem = firstElem.cloneNode(false);
+            let fileInputs = this.form.querySelectorAll('input[type="file"]');
+            let prevElem = firstElem.previousElementSibling;
 
-        let firstElem = this.form.querySelector('input[type="file"]');
-        let cloneFirstElem = firstElem.cloneNode(false);
-        let fileInputs = this.form.querySelectorAll('input[type="file"]');
-        let prevElem = firstElem.previousElementSibling;
-
-        for (let i = 0; i < fileInputs.length - 1; i++) {
-            if (globalVars.labelFirst) {
-                fileInputs[i].previousElementSibling.remove();
-                fileInputs[i].remove();
-            } else {
-                fileInputs[i].nextElementSibling.remove();
-                fileInputs[i].remove();
+            for (let i = 0; i < fileInputs.length - 1; i++) {
+                if (globalVars.labelFirst) {
+                    fileInputs[i].previousElementSibling.remove();
+                    fileInputs[i].remove();
+                } else {
+                    fileInputs[i].nextElementSibling.remove();
+                    fileInputs[i].remove();
+                }
             }
+            this.form.querySelectorAll('input[type="file"]')[form.querySelectorAll('input[type="file"]').length - 1].removeAttribute('disabled', '');
+            if (globalVars.inputFirst) {
+                this.form.querySelectorAll('input[type="file"]').nextElementSibling.innerHTML = ''
+            }
+            globalVars.inputsArray = [];
+            globalVars.amountFiles = 0;
+            globalVars.counter = 0;
         }
-
-        this.form.querySelectorAll('input[type="file"]')[form.querySelectorAll('input[type="file"]').length - 1].removeAttribute('disabled', '');
-        if (globalVars.inputFirst) {
-            this.form.querySelectorAll('input[type="file"]').nextElementSibling.innerHTML = ''
-        }
-        globalVars.inputsArray = [];
-        globalVars.amountFiles = 0;
-        globalVars.counter = 0;
     }
 
     sendInfo = async (url) => {
@@ -275,6 +275,7 @@ class validateForm {
                 this.onSuccess();
                 this.cleanForm();
                 this.form.querySelector('input[type="submit"]').removeAttribute('disabled');
+                return data;
             })
             .catch(error => {
                 this.onError();
