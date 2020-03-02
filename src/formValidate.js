@@ -199,7 +199,7 @@ class validateForm {
         }
     }
 
-    phoneValidation = input => {
+    phoneValidation(input) {
         if (input.value.match(this.phoneRegExp)) {
             this.errors.pop(input);
             input.classList.remove(this.errorClass);
@@ -211,7 +211,7 @@ class validateForm {
         return false;
     }
 
-    emailValidation = input => {
+    emailValidation(input) {
         if (input.value.match(this.emailRegExp)) {
             this.errors.pop(input);
             input.classList.remove(this.errorClass);
@@ -222,7 +222,7 @@ class validateForm {
         return false;
     }
 
-    passwordValidation = input => {
+    passwordValidation(input) {
         if (input.value.match(this.passwordRegExp)) {
             this.errors.pop(input);
             input.classList.remove(this.errorClass);
@@ -260,7 +260,7 @@ class validateForm {
         }
     }
 
-    sendInfo = async (url) => {
+    sendInfo(url) {
         let data = new FormData(this.form);
         this.form.querySelector('input[type="submit"]').setAttribute('disabled', '');
         this.onLoadStart();
