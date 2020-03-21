@@ -150,6 +150,9 @@ class validateForm {
         this.onSuccess = options.onSuccess || (() => {});
         this.onError = options.onError || (() => {});
         this.errorClass = options.errorClass || 'error';
+        this.customFields = options.customFields || [];
+        this.data = null;
+        this.error = null;
 
         this.validation();
     }
@@ -163,6 +166,7 @@ class validateForm {
             if (inputs[i].type === 'button' || inputs[i].type === 'submit') {
                 continue;
             }
+
             let required = inputs[i].getAttribute('data-role').includes('required');
 
             if ((required && inputs[i].value === '') ||
@@ -175,7 +179,14 @@ class validateForm {
             } else if (inputs[i].getAttribute('data-role').includes('password')) {
                 this.passwordValidation(inputs[i]);
             } else {
+
                 inputs[i].classList.remove(this.errorClass);
+            }
+
+            for (let j = 0; j < this.customFields.length; j++) {
+                if (inputs[i].getAttribute('data-role').includes(this.customFields[j].dataRole)) {
+                    this.customFieldValidation(inputs[i], this.customFields[j].regExp)
+                }
             }
         }
 
@@ -199,11 +210,20 @@ class validateForm {
         }
     }
 
+    customFieldValidation(input, regExp) {
+        if (input.value.match(regExp)) {
+            input.classList.remove(this.errorClass);
+            return true;
+        }
+
+        this.errors.push(input);
+        input.classList.add(this.errorClass);
+        return false;
+    }
+
     phoneValidation(input) {
         if (input.value.match(this.phoneRegExp)) {
-            this.errors.pop(input);
             input.classList.remove(this.errorClass);
-
             return true;
         }
 
@@ -213,7 +233,6 @@ class validateForm {
 
     emailValidation(input) {
         if (input.value.match(this.emailRegExp)) {
-            this.errors.pop(input);
             input.classList.remove(this.errorClass);
             return true;
         }
@@ -224,7 +243,6 @@ class validateForm {
 
     passwordValidation(input) {
         if (input.value.match(this.passwordRegExp)) {
-            this.errors.pop(input);
             input.classList.remove(this.errorClass);
             return true;
         }
@@ -272,14 +290,15 @@ class validateForm {
                 return response.json();
             })
             .then(data => {
+                this.data = data;
                 this.onSuccess();
                 this.cleanForm();
                 this.form.querySelector('input[type="submit"]').removeAttribute('disabled');
-                return data;
             })
             .catch(error => {
+                this.error = error;
                 this.onError();
-                console.log(error);
+                this.form.querySelector('input[type="submit"]').removeAttribute('disabled');
             });
     }
 }

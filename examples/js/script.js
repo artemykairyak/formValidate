@@ -1,33 +1,32 @@
 let form = document.querySelector('.form');
 
-form.addEventListener('change', (e) => {
-	if(e.target.getAttribute('type') === 'file') {
-		reloadFiles({
-			form: form, 
-			target: e.target,
-			addText: 'Upload more',
-			limit: 3
-		});
-	}
-});
-
 form.addEventListener('submit', function(e) {
     e.preventDefault();
     formValidate({
         form: form,
-        phoneRegExp: null,
-        emailRegExp: null,
-        passwordRexExp: null,
-        errorClass: null,
-        url: 'http://cors-anywhere.herokuapp.com/http://shop.bitrix24.asap-lp.ru/form_test/index.php',
-        onLoadStart: () => {
+        customFields: [
+        {
+        	dataRole: 'series', 
+        	regExp: /^([0-9]{4})?$/
+        },
+        {
+        	dataRole: 'number', 
+        	regExp: /^([0-9]{6})?$/
+        },
+        {
+        	dataRole: 'code', 
+        	regExp: /^([0-9]{3}[-]{1}[0-9]{3})?$/
+        },
+        ],
+        url: 'http://cors-anywhere.herokuapp.com/http://test.asap-lp.ru/mail/index.php',
+        onLoadStart: function() {
             console.log('load start');
         },
-        onSuccess: () => {
-            console.log('success');
+        onSuccess: function() {
+        	console.log(this.data);
         },
-        onError: () => {
-            console.log('error')
+        onError: function() {
+        	console.log(this.error);
         }
     });
 })
